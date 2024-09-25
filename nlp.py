@@ -142,6 +142,19 @@ def perform_math_operation(inpText):
         return text_to_speech
     except Exception as e:
         return f"Error: {str(e)}"
+    
+def extract_language_to_translate(text):
+    extracted_text = ""
+    words = text.split()
+    try:
+        index = words.index("translate")
+        if index + 1 < len(words) and words[index + 1] == "this":
+            if index + 2 < len(words):
+                extracted_text = " ".join(words[index + 2:])
+    except ValueError:
+        pass
+    return extracted_text
+
 
 def extract_city(text):
     city = ""
@@ -196,6 +209,16 @@ while True:
                     engine.runAndWait()
                 else:
                     print("City not specified.")
+            elif "translate this" in inpText.lower():
+                text_to_translate = extract_language_to_translate(inpText)
+                if text_to_translate:
+                    print("Translating:", text_to_translate)
+                    translated_text = GoogleTranslator(source='auto', target='id').translate(text_to_translate)
+                    print("Translated text:", translated_text)
+                    engine.say(translated_text)
+                    engine.runAndWait()
+                else:
+                    print("Text to translate not specified.")
             elif "calculate " in inpText.lower():
                 mathOperation = inpText.lower().replace("calculate ", "")
                 print(perform_math_operation(mathOperation))
